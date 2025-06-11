@@ -1,0 +1,872 @@
+Making Your First API Call
+
+Once you have your API key, you can make your first API call.
+Send the API key as a bearer token in the Authorization header with each request.
+​
+Example API Call
+
+
+cURL
+
+python
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+--header 'accept: application/json' \
+--header 'content-type: application/json' \
+--header 'Authorization: Bearer {API_KEY}' \
+--data '{
+  "model": "sonar-pro",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Be precise and concise."
+    },
+    {
+      "role": "user",
+      "content": "How many stars are there in our galaxy?"
+    }
+  ]
+}'
+If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring “Automatic Top Up,” which refreshes your balance whenever it drops below a certain threshold.
+Auto Reload
+
+Prompt Guide
+​
+System Prompt
+
+You can use the system prompt to provide instructions related to style, tone, and language of the response.
+
+The real-time search component of our models does not attend to the system prompt.
+Example of a system prompt
+
+
+Copy
+You are a helpful AI assistant.
+
+Rules:
+1. Provide only the final answer. It is important that you do not include any explanation on the steps below.
+2. Do not show the intermediate steps information.
+
+Steps:
+1. Decide if the answer should be a brief sentence or a list of suggestions.
+2. If it is a list of suggestions, first, write a brief and natural introduction based on the original query.
+3. Followed by a list of suggestions, each suggestion should be split by two newlines.
+​
+User Prompt
+
+You should use the user prompt to pass in the actual query for which you need an answer for. The user prompt will be used to kick off a real-time web search to make sure the answer has the latest and the most relevant information needed.
+
+Example of a user prompt
+
+
+Copy
+What are the best sushi restaurants in the world currently?
+​
+Web Search Models: General Prompting Guidelines
+
+Our web search-powered models combine the capabilities of LLMs with real-time web searches. Understanding how they differ from traditional LLMs will help you craft more effective prompts.
+
+​
+Best Practices for Prompting Web Search Models
+
+Be Specific and Contextual
+Unlike traditional LLMs, our web search models require specificity to retrieve relevant search results. Adding just 2-3 extra words of context can dramatically improve performance.
+Good Example: “Explain recent advances in climate prediction models for urban planning”
+Poor Example: “Tell me about climate models”
+Avoid Few-Shot Prompting
+While few-shot prompting works well for traditional LLMs, it confuses web search models by triggering searches for your examples rather than your actual query.
+Good Example: “Summarize the current research on mRNA vaccine technology”
+Poor Example: “Here’s an example of a good summary about vaccines: [example text]. Now summarize the current research on mRNA vaccines.”
+Think Like a Web Search User
+Craft prompts with search-friendly terms that would appear on relevant web pages. Consider how experts in the field would describe the topic online.
+Good Example: “Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use”
+Poor Example: “Tell me which home heating is better”
+Provide Relevant Context
+Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+Good Example: “Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers”
+Poor Example: “What are the rules for app stores?”
+​
+Web Search Model Pitfalls to Avoid
+
+Overly Generic Questions
+Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+Avoid: “What’s happening in AI?”
+Instead: “What are the three most significant commercial applications of generative AI in healthcare in the past year?”
+Traditional LLM Techniques
+Prompting strategies designed for traditional LLMs often don’t work well with web search models. Adapt your approach accordingly.
+Avoid: “Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then…”
+Instead: “What’s a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.”
+Complex Multi-Part Requests
+Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+Avoid: “Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.”
+Instead: “Explain quantum computing principles that might impact cryptography in the next decade.”
+Assuming Search Intent
+Don’t assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+Avoid: “Tell me about the latest developments.”
+Instead: “What are the latest developments in offshore wind energy technology announced in the past 6 months?”
+​
+Advanced Techniques
+
+We recommend for users not to tune language parameters such as temperature, as the default settings for these have already been optimized.
+Parameter Optimization
+Adjust model parameters based on your specific needs:
+Search Domain Filter: Limit results to trusted sources for research-heavy queries.
+Search Context Size: Use “high” for comprehensive research questions and “low” for simple factual queries.
+Example configuration for technical documentation:
+
+Copy
+{
+  "search_domain_filter": ["wikipedia.org", "docs.python.org"],
+  "web_search_options": {
+    "search_context_size": "medium"
+  }
+}
+​
+Tips for Different Query Types
+
+Query Type	Best Practices
+Factual Research	• Use specific questions • Use search domain filters for academic sources • Consider “high” search context size
+Creative Content	• Provide detailed style guidelines in system prompt • Specify tone, voice, and audience
+Technical Questions	• Include relevant technical context • Specify preferred programming language/framework • Use domain filters for documentation sites
+Analysis & Insights	• Request step-by-step reasoning • Ask for specific metrics or criteria
+
+
+Search Domain Filter Guide
+The search_domain_filter feature allows you to limit search results to specific domains or exclude certain domains from search results.
+You can add a maximum of 10 domains to the search_domain_filter list.
+​
+Overview
+
+The search_domain_filter parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+Restrict search results to trusted sources
+Filter out specific domains from search results
+Focus research on particular websites
+Enabling domain filtering can be done by adding a search_domain_filter field in the request:
+
+
+Copy
+"search_domain_filter": [
+  "<domain1>",
+  "<domain2>",
+  ...
+]
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (-).
+
+​
+Examples
+
+​
+1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+Request
+
+
+Copy
+import requests
+
+url = "https://api.perplexity.ai/chat/completions"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+payload = {
+    "model": "sonar-reasoning-pro",
+    "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Tell me about the James Webb Space Telescope discoveries."}
+    ],
+    "search_domain_filter": [
+        "nasa.gov",
+        "wikipedia.org",
+        "space.com"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response["choices"][0]["message"]["content"])
+Best Practice: Use simple domain names (e.g., wikipedia.org) without additional elements like https:// or www. prefixes.
+
+​
+2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (-).
+
+Request
+
+
+Copy
+import requests
+
+url = "https://api.perplexity.ai/chat/completions"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+payload = {
+    "model": "sonar-deep-research",
+    "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What are the latest advancements in renewable energy?"}
+    ],
+    "search_domain_filter": [
+        "-pinterest.com",
+        "-reddit.com",
+        "-quora.com"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response["choices"][0]["message"]["content"])
+Best Practice: Use simple domain names with a minus prefix (e.g., -pinterest.com) to exclude domains from search results.
+
+​
+Best Practices
+
+​
+Domain Specification
+
+Use simple domain names: Specify domains in their simplest form (e.g., example.com) without protocol prefixes (http://, https://) or subdomain specifiers (www.).
+Main domains only: Using the main domain (e.g., nytimes.com) will filter all subdomains as well.
+​
+Filter Optimization
+
+Be specific: Use domains that are most relevant to your query to get the best results.
+Combine approaches: You can mix inclusion and exclusion in the same request (e.g., ["wikipedia.org", "-pinterest.com"]).
+Limit filter size: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+​
+Performance Considerations
+
+Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+Structured Outputs Guide
+The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+​
+Overview
+
+We currently support two types of structured outputs: JSON Schema and Regex. LLM responses will work to match the specified format, except for the following cases:
+
+The output exceeds max_tokens
+Enabling the structured outputs can be done by adding a response_format field in the request:
+
+JSON Schema
+
+response_format: { type: "json_schema", json_schema: {"schema": object} } .
+
+The schema should be a valid JSON schema object.
+
+Regex (only available for sonar right now)
+
+response_format: { type: "regex", regex: {"regex": str} } .
+
+The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+​
+Examples
+
+​
+1. Get a response in JSON format
+
+Request
+
+
+Copy
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = "https://api.perplexity.ai/chat/completions"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+payload = {
+    "model": "sonar",
+    "messages": [
+        {"role": "system", "content": "Be precise and concise."},
+        {"role": "user", "content": (
+            "Tell me about Michael Jordan. "
+            "Please output a JSON object containing the following fields: "
+            "first_name, last_name, year_of_birth, num_seasons_in_nba. "
+        )},
+    ],
+    "response_format": {
+		    "type": "json_schema",
+        "json_schema": {"schema": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response["choices"][0]["message"]["content"])
+Response
+
+
+Copy
+{"first_name":"Michael","last_name":"Jordan","year_of_birth":1963,"num_seasons_in_nba":15}
+​
+2. Use a regex to output the format
+
+Request
+
+python
+
+Copy
+import requests
+
+url = "https://api.perplexity.ai/chat/completions"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+payload = {
+    "model": "sonar",
+    "messages": [
+        {"role": "system", "content": "Be precise and concise."},
+        {"role": "user", "content": "What is the IPv4 address of OpenDNS DNS server?"},
+    ],
+    "response_format": {
+		    "type": "regex",
+        "regex": {"regex": r"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response["choices"][0]["message"]["content"])
+Response
+
+
+Copy
+208.67.222.222
+​
+Best Practices
+
+​
+Generating responses in a JSON Format
+
+For Python users, we recommend using the Pydantic library to generate JSON schema.
+
+Unsupported JSON Schemas
+
+Recursive JSON schema is not supported. As a result of that, unconstrained objects are not supported either. Here’s a few example of unsupported schemas:
+
+
+Copy
+# UNSUPPORTED!
+
+from typing import Any
+
+class UnconstrainedDict(BaseModel):
+   unconstrained: dict[str, Any]
+
+class RecursiveJson(BaseModel):
+   value: str
+   child: list["RecursiveJson"]
+​
+Generating responses using a regex
+
+Supported Regex
+
+Characters: \d, \w, \s , .
+Character classes: [0-9A-Fa-f] , [^x]
+Quantifiers: *, ? , +, {3}, {2,4} , {3,}
+Alternation: |
+Group: ( ... )
+Non-capturing group: (?: ... )
+Positive lookahead: (?= ... )
+Negative lookahead: (?! ... )
+Unsupported Regex
+
+Contents of group: \1
+Anchors: ^, $, \b
+Positive look-behind: (?<= ... )
+Negative look-behind: (?<! ... )
+Recursion: (?R)
+​
+Structured Outputs for Reasoning Models
+
+When using structured outputs with reasoning models like sonar-reasoning-pro, the response will include a <think> section containing reasoning tokens, immediately followed by the structured output. The response_format parameter does not remove these reasoning tokens from the output, so the final response will need to be parsed manually.
+
+Sample Response:
+
+
+Copy
+<think>
+I need to provide information about France in a structured JSON format with specific fields: country, capital, population, official_language.
+
+For France:
+- Country: France
+- Capital: Paris
+- Population: About 67 million (as of 2023)
+- Official Language: French
+
+Let me format this information as required.
+</think>
+{"country":"France","capital":"Paris","population":67750000,"official_language":"French"}
+For a reusable implementation to extract JSON from reasoning model outputs, see our example utility on GitHub.
+
+Image Guide
+Learn how to use Sonar’s image upload feature.
+The image upload feature allows you to include images in your API requests to support multi-modal conversations alongside text. Images can be provided either as base64 encoded strings within a data URI or as standard HTTPS URLs.
+When using base64 encoding, the API currently only supports images up to 5 MB per image.
+Supported formats for base64 encoded images: PNG (image/png), JPEG (image/jpeg), WEBP (image/webp), and GIF (image/gif).
+When using an HTTPS URL, the model will attempt to fetch the image from the provided URL. Ensure the URL is publicly accessible.
+Image uploads can be useful for:
+
+Asking questions about visual content (e.g., text in a screenshot, diagram interpretation)
+Providing context for follow-up queries
+Analyzing visual media as part of a multi-turn conversation
+⸻
+
+​
+Overview
+
+To include an image in a request, you can either:
+
+Encode the image as a base64 string and embed it in a data URI using the following format:
+
+Copy
+data:image/png;base64,<BASE64_ENCODED_IMAGE>
+Replace image/png with the correct MIME type if you’re using JPEG or GIF (image/jpeg or image/gif).
+Provide a standard HTTPS URL pointing directly to the image file:
+
+Copy
+https://example.com/path/to/your/image.png
+This data URI or HTTPS URL should be included in your API request as part of a messages array, using the image_url content type.
+
+⸻
+
+​
+Request Format
+
+Images must be embedded in the messages array, alongside any text input. Each image should be provided using the following structure:
+
+Using Base64 Data URI:
+
+
+Copy
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "data:image/png;base64,<BASE64_ENCODED_IMAGE>"
+  }
+}
+Using HTTPS URL:
+
+
+Copy
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "https://example.com/path/to/your/image.png"
+  }
+}
+⸻
+
+​
+Examples
+
+Base64 Encoding
+HTTPS URL
+Use this method when you have the image file locally and want to embed it directly into the request payload. Remember the 5MB size limit and supported formats (PNG, JPEG, WEBP, GIF).
+
+cURL (Base64)
+
+Python (Base64)
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+--header 'accept: application/json' \
+--header 'content-type: application/json' \
+--header 'Authorization: Bearer YOUR_API_KEY' \
+--data '{
+  "model": "sonar-pro",
+  "stream": false,
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Can you describe this image?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..." // Replace with your base64 string
+          }
+        }
+      ]
+    }
+  ]
+}'
+
+Date Range Filter Guide
+The search_after_date_filter and search_before_date_filter parameters allow you to restrict search results to a specific publication date range. Only results with publication dates falling between these dates will be returned.
+Dates must be provided in the “%m/%d/%Y” format (e.g., “3/1/2025”). These filters are optional—you may supply either one or both as needed.
+​
+Overview
+
+The search_after_date_filter and search_before_date_filter parameters control which search results are returned by limiting them to a specific publication date range. This feature is useful when you need to: • Narrow down search results to a particular time period • Exclude outdated or overly recent content • Improve relevance by focusing on content published within a defined window
+
+To constrain search results by publication date, include the following fields in your request payload:
+
+
+Copy
+"search_after_date_filter": "3/1/2025",
+"search_before_date_filter": "3/5/2025"
+These filters will be applied in addition to any other search parameters (for example, domain filters).
+
+​
+Examples
+
+1. Limiting Results to a Specific Date Range
+
+This example limits search results to content published between March 1, 2025, and March 5, 2025.
+
+Request Example
+
+
+
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar-pro",
+    "messages": [
+      {"role": "system", "content": "You are an expert on current events."},
+      {"role": "user", "content": "Show me tech news published this week."}
+    ],
+    "search_after_date_filter": "3/1/2025",
+    "search_before_date_filter": "3/5/2025",
+    "search_recency_filter": "month"
+}'
+2. Filtering with a Single Date Parameter
+
+If you only wish to restrict the results to those published on or after a specific date, include just the search_after_date_filter:
+
+
+Copy
+payload = {
+    "model": "sonar-pro",
+    "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Show me news articles published after March 1, 2025."}
+    ],
+    "search_after_date_filter": "3/1/2025",
+    "search_recency_filter": "month"
+}
+​
+Best Practices
+
+Date Format • Strict Format: Dates must match the “%m/%d/%Y” format exactly. For example, the date “3/1/2025” or “03/01/2025” is acceptable. • Consistency: Use one or both filters consistently based on your search needs. Combining both provides a clear range.
+
+Client-Side Validation • Regex Check: Validate date strings on the client side (or via the API) using a regex such as:
+
+
+
+
+Copy
+date_regex='^(0?[1-9]|1[0-2])/(0?[1-9]|[12][0-9]|3[01])/[0-9]{4}$'
+This ensures that dates conform to the required format before sending the request.
+
+Performance Considerations • Narrowing the Search: Applying date range filters typically reduces the number of results, which may improve response times and result relevance. • Avoid Over-Restriction: Ensure that the date range is neither too narrow (limiting useful results) nor too broad (defeating the purpose of the filter).
+
+User Location Filter Guide
+The user_location parameter within web_search_options allows you to refine search results based on the user’s approximate geographic location. This helps provide more contextually relevant information.
+You can specify the location using latitude/longitude coordinates, a two-letter ISO country code, or a combination of both coordinates and country code.
+​
+Overview
+
+The user_location filter helps tailor search results by incorporating geographic context. This is particularly useful for queries where location significantly impacts relevance, such as:
+
+Finding local businesses or services.
+Getting information about regional events or news.
+Understanding location-specific regulations or customs.
+To refine search results by location, include the user_location object within the web_search_options in your request payload. You can provide coordinates, a country code, or combine them:
+
+Using Latitude/Longitude:
+
+
+Copy
+"web_search_options": {
+  "user_location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  }
+}
+Using Country Code:
+
+
+Copy
+"web_search_options": {
+  "user_location": {
+    "country": "US"
+  }
+}
+Combining Latitude/Longitude and Country Code:
+
+
+Copy
+"web_search_options": {
+  "user_location": {
+    "latitude": 48.8566, 
+    "longitude": 2.3522,
+    "country": "FR" // Example: Paris, France
+  }
+}
+These filters work alongside other search parameters like date range or domain filters.
+
+​
+Examples
+
+1. Refining Results with Latitude and Longitude
+
+This example provides specific coordinates (approximating San Francisco) to get geographically relevant search results.
+
+Request Example
+
+
+cURL
+
+Python
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar-pro",
+    "messages": [
+      {"role": "system", "content": "You are a helpful local guide."},
+      {"role": "user", "content": "What are some good coffee shops nearby?"}
+    ],
+    "web_search_options": {
+      "user_location": {
+        "latitude": 37.7749,
+        "longitude": -122.4194
+      }
+    }
+}'
+2. Refining Results with Country Code
+
+This example uses a two-letter ISO country code (United States) to provide broader geographic context.
+
+Request Example
+
+
+cURL
+
+Python
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar-pro",
+    "messages": [
+      {"role": "system", "content": "You are an expert on international news."},
+      {"role": "user", "content": "Summarize today's political news."}
+    ],
+    "web_search_options": {
+      "user_location": {
+        "country": "US"
+      }
+    }
+}'
+3. Combining Coordinates and Country Code
+
+This example provides both specific coordinates (approximating Paris) and the country code (“FR”) for maximum geographic context.
+
+Request Example
+
+
+cURL
+
+Python
+
+Copy
+curl --location 'https://api.perplexity.ai/chat/completions' \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar-pro",
+    "messages": [
+      {"role": "system", "content": "You are an expert on French news and events."},
+      {"role": "user", "content": "What major events are happening in the capital this week?"}
+    ],
+    "web_search_options": {
+      "user_location": {
+        "latitude": 48.8566, 
+        "longitude": 2.3522,
+        "country": "FR"
+      }
+    }
+}'
+​
+Best Practices
+
+Choosing the Right Specificity • Latitude/Longitude: Use for high precision when the exact location is known and relevant (e.g., finding nearby points of interest). • Country Code: Use for broader context when country-level relevance is sufficient (e.g., national news, country-specific regulations). • Combining Fields: Providing both coordinates and country code can offer the most context. The coordinates give precision, while the country code adds broader regional signals (like language or national context) that might influence results.
+
+Data Accuracy • Ensure the provided location data is as accurate as possible. Incorrect data may lead to irrelevant results. • Latitude values must be between -90 and 90. Longitude values must be between -180 and 180. • Country codes should be valid two-letter ISO 3166-1 alpha-2 codes (e.g., “US”, “GB”, “DE”).
+
+Privacy Considerations • Be mindful of user privacy when collecting and transmitting location data. Only use location when necessary and with user consent where applicable.
+
+Client-Side Validation • Consider validating location inputs before sending the request:
+
+Check latitude/longitude ranges.
+Validate country code format (two uppercase letters).
+
+Search Context Size
+The search_context_size parameter allows you to control how much search context is retrieved from the web during query resolution, letting you balance cost and comprehensiveness.
+Default search_context_size is low
+Selecting "high" increases search costs due to more extensive web retrieval. Use "low" when cost efficiency is critical.
+​
+Overview
+
+The search_context_size field—passed via the web_search_options object—determines how much search context is retrieved by the Sonar models. This setting can help you optimize for either:
+
+Cost savings with minimal search input (low)
+Comprehensive answers by maximizing retrieved information (high)
+A balance of both (medium)
+This flexibility allows teams to tune their API usage to their budget and use case.
+
+To enable this feature, include the web_search_options.search_context_size parameter in your request payload:
+
+
+Copy
+"web_search_options": {
+  "search_context_size": "medium"
+}
+​
+Best Practices
+
+Choosing the Right Context Size
+
+low: Best for short factual queries or when operating under strict token cost constraints.
+medium: The default and best suited for general use cases.
+high: Use for deep research, exploratory questions, or when citations and evidence coverage are critical.
+Cost Optimization
+
+Selecting low or medium can significantly reduce overall token usage, especially at scale.
+Consider defaulting to low for high-volume endpoints and selectively upgrading to high for complex user prompts.
+Combining with Other Filters
+
+You can use search_context_size alongside other features like search_domain_filter to further control the scope of search.
+Combining medium with a focused domain filter often gives a good tradeoff between quality and cost.
+Performance Considerations
+
+Larger context sizes may slightly increase response latency due to more extensive search and reranking.
+If you’re batching queries or supporting real-time interfaces, test with different settings to balance user experience and runtime.
+​
+Examples
+
+1. Minimal Search Context (“low”)
+
+This option limits the search context retrieved for the model, reducing cost per request while still producing useful responses for simpler questions.
+
+​
+Request
+
+
+cURL
+
+python
+
+Copy
+curl --request POST \
+  --url https://api.perplexity.ai/chat/completions \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be precise and concise."
+      },
+      {
+        "role": "user",
+        "content": "How many stars are there in our galaxy?"
+      }
+    ],
+    "web_search_options": {
+      "search_context_size": "low"
+    }
+  }'
+Pro-tip: Use low when cost optimization is more important than answer completeness.
+
+2. Comprehensive Search Context (“high”)
+
+This option maximizes the amount of search context used to answer the question, resulting in more thorough and nuanced responses.
+
+​
+Request
+
+
+cURL
+
+python
+
+Copy
+curl --request POST \
+  --url https://api.perplexity.ai/chat/completions \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sonar-reasoning-pro",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be precise and concise."
+      },
+      {
+        "role": "user",
+        "content": "Explain the economic causes of the 2008 financial crisis."
+      }
+    ],
+    "web_search_options": {
+      "search_context_size": "high"
+    }
+  }'
+
+API reference
+
+python:
+import requests
+
+url = "https://api.perplexity.ai/chat/completions"
+
+payload = {
+    "model": "sonar",
+    "messages": [
+        {
+            "role": "system",
+            "content": "Be precise and concise."
+        },
+        {
+            "role": "user",
+            "content": "How many stars are there in our galaxy?"
+        }
+    ]
+}
+headers = {
+    "Authorization": "Bearer <token>",
+    "Content-Type": "application/json"
+}
+
+response = requests.request("POST", url, json=payload, headers=headers)
+
+print(response.text)
+
+Javascript:
+const options = {
+  method: 'POST',
+  headers: {Authorization: 'Bearer <token>', 'Content-Type': 'application/json'},
+  body: '{"model":"sonar","messages":[{"role":"system","content":"Be precise and concise."},{"role":"user","content":"How many stars are there in our galaxy?"}]}'
+};
+
+fetch('https://api.perplexity.ai/chat/completions', options)
+  .then(response => response.json())
+  .then(response => console.log(response))
+  .catch(err => console.error(err));
+
