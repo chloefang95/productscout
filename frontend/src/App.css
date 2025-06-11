@@ -133,6 +133,44 @@
   white-space: pre-wrap;
 }
 
+.result-content {
+  color: #555;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.formatted-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.bullet-point {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.bullet-point::before {
+  content: "•";
+  color: #667eea;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.bullet-point strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.regular-text {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 20px;

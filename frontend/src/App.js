@@ -7,6 +7,82 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Helper function to remove citation brackets like [1], [2], [3], etc.
+  const removeCitations = (text) => {
+    if (!text) return text;
+    return text.replace(/\[\d+\]/g, '').trim();
+  };
+
+  // Helper function to format bullet points with bold headings
+  const formatBulletPoints = (text) => {
+    if (!text) return text;
+    
+    // Split text into lines
+    const lines = text.split('\n');
+    const formattedLines = [];
+    
+    for (let line of lines) {
+      line = line.trim();
+      
+      // Check if line starts with a dash and has a colon
+      if (line.startsWith('-') && line.includes(':')) {
+        // Extract the part before and after the colon
+        const withoutDash = line.substring(1).trim(); // Remove the dash
+        const colonIndex = withoutDash.indexOf(':');
+        
+        if (colonIndex > 0) {
+          const heading = withoutDash.substring(0, colonIndex).trim();
+          const content = withoutDash.substring(colonIndex + 1).trim();
+          
+          // Create formatted bullet point with bold heading
+          formattedLines.push(
+            <li key={formattedLines.length} className="bullet-point">
+              <strong>{heading}:</strong> {content}
+            </li>
+          );
+        } else {
+          // If no colon found, just format as regular bullet
+          formattedLines.push(
+            <li key={formattedLines.length} className="bullet-point">
+              {withoutDash}
+            </li>
+          );
+        }
+      } else if (line.startsWith('-')) {
+        // Regular bullet point without colon
+        const withoutDash = line.substring(1).trim();
+        formattedLines.push(
+          <li key={formattedLines.length} className="bullet-point">
+            {withoutDash}
+          </li>
+        );
+      } else if (line.length > 0) {
+        // Regular paragraph text
+        formattedLines.push(
+          <p key={formattedLines.length} className="regular-text">
+            {line}
+          </p>
+        );
+      }
+    }
+    
+    // If we have bullet points, wrap them in a ul
+    const hasBullets = formattedLines.some(line => line.type === 'li');
+    if (hasBullets) {
+      return (
+        <div>
+          <ul className="formatted-list">
+            {formattedLines.filter(line => line.type === 'li')}
+          </ul>
+          {formattedLines.filter(line => line.type !== 'li')}
+        </div>
+      );
+    }
+    
+    // If no bullets, return as div with paragraphs
+    return <div>{formattedLines}</div>;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!idea.trim()) {
@@ -82,17 +158,23 @@ function App() {
           <div className="results">
             <div className="result-section">
               <h3>📊 Summary</h3>
-              <p>{results.summary}</p>
+              <div className="result-content">
+                {formatBulletPoints(removeCitations(results.summary))}
+              </div>
             </div>
 
             <div className="result-section">
               <h3>⚠️ Pain Points</h3>
-              <p>{results.pain_points}</p>
+              <div className="result-content">
+                {formatBulletPoints(removeCitations(results.pain_points))}
+              </div>
             </div>
 
             <div className="result-section">
               <h3>💡 Features Suggested</h3>
-              <p>{results.features}</p>
+              <div className="result-content">
+                {formatBulletPoints(removeCitations(results.features))}
+              </div>
             </div>
           </div>
         )}
