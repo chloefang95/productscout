@@ -92,34 +92,51 @@ function App() {
   const extractMainTopic = (text, originalText) => {
     // Look for clear topic indicators - the main subject matter
     const topicKeywords = [
-      // Direct system/feature names
-      { patterns: ['credit system', 'generative credit'], topic: 'Credit System' },
-      { patterns: ['pricing structure', 'pricing'], topic: 'Pricing' },
-      { patterns: ['output quality', 'ai output', 'quality'], topic: 'Output Quality' },
-      { patterns: ['integration'], topic: 'Integration' },
-      { patterns: ['batch processing', 'batch'], topic: 'Batch Processing' },
-      { patterns: ['mobile', 'mobile app'], topic: 'Mobile Features' },
-      { patterns: ['api'], topic: 'API' },
-      { patterns: ['video generation', 'video'], topic: 'Video Features' },
-      { patterns: ['disk space', 'storage'], topic: 'Storage' },
-      { patterns: ['legal', 'ethical', 'licensing'], topic: 'Legal & Ethics' },
-      { patterns: ['photoshop', 'illustrator', 'express'], topic: 'Adobe Integration' },
+      // Direct system/feature names (more comprehensive)
+      { patterns: ['credit system', 'generative credit', 'credits', 'credit'], topic: 'Credit System' },
+      { patterns: ['pricing structure', 'pricing', 'subscription', 'cost'], topic: 'Pricing' },
+      { patterns: ['output quality', 'ai output', 'quality', 'photorealism', 'inferior'], topic: 'Output Quality' },
+      { patterns: ['integration', 'fragmented', 'cross-product'], topic: 'Integration' },
+      { patterns: ['batch processing', 'batch', 'prompt processing'], topic: 'Batch Processing' },
+      { patterns: ['mobile', 'mobile app', 'mobile support', 'mobile features'], topic: 'Mobile Features' },
+      { patterns: ['api', 'third-party', 'direct api'], topic: 'API Access' },
+      { patterns: ['video generation', 'video', 'video features'], topic: 'Video Features' },
+      { patterns: ['disk space', 'storage', 'export resolution'], topic: 'Storage & Resolution' },
+      { patterns: ['legal', 'ethical', 'licensing', 'commercial'], topic: 'Legal & Ethics' },
+      { patterns: ['photoshop', 'illustrator', 'express', 'adobe'], topic: 'Adobe Integration' },
+      { patterns: ['advanced', 'prompt controls', 'prompt weighting', 'seed control'], topic: 'Advanced Controls' },
+      { patterns: ['style', 'customization', 'user-trainable', 'style transfer'], topic: 'Style Customization' },
+      { patterns: ['higher', 'resolution', 'professional', 'high-end'], topic: 'Resolution & Quality' },
+      { patterns: ['deeper', 'workflow', 'after effects', 'creative pipeline'], topic: 'Workflow Integration' },
       
       // Problem types as topics
-      { patterns: ['feature limitations', 'lack of'], topic: 'Missing Features' },
-      { patterns: ['frustration'], topic: 'User Frustration' },
-      { patterns: ['bug', 'error'], topic: 'Technical Issues' },
+      { patterns: ['feature limitations', 'lack of', 'missing'], topic: 'Missing Features' },
+      { patterns: ['frustration', 'frustrated'], topic: 'User Frustration' },
+      { patterns: ['bug', 'error', 'technical'], topic: 'Technical Issues' },
       { patterns: ['performance', 'slow', 'laggy'], topic: 'Performance' },
-      { patterns: ['usability', 'confusing', 'difficult'], topic: 'Usability' }
+      { patterns: ['usability', 'confusing', 'difficult'], topic: 'Usability' },
+      { patterns: ['support', 'documentation', 'guidance'], topic: 'Support & Documentation' }
     ];
     
-    // Find the best match
+    // Find the best match with multiple pattern matching
+    let bestMatch = null;
+    let maxMatches = 0;
+    
     for (const topicGroup of topicKeywords) {
+      let matches = 0;
       for (const pattern of topicGroup.patterns) {
         if (text.includes(pattern)) {
-          return topicGroup.topic;
+          matches++;
         }
       }
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        bestMatch = topicGroup;
+      }
+    }
+    
+    if (bestMatch && maxMatches > 0) {
+      return bestMatch.topic;
     }
     
     return null;
@@ -132,7 +149,7 @@ function App() {
     if (quotes && quotes.length > 0) {
       const quote = quotes[0].replace(/"/g, '').trim();
       // Use the quote if it's concise and descriptive
-      if (quote.length > 5 && quote.length < 35 && !quote.includes(',')) {
+      if (quote.length > 8 && quote.length < 40 && !quote.includes(',')) {
         return quote;
       }
     }
@@ -141,21 +158,41 @@ function App() {
     const parenthetical = originalText.match(/\(([^)]+?)\)/);
     if (parenthetical) {
       const desc = parenthetical[1].trim();
-      if (desc.length > 5 && desc.length < 30 && !desc.includes(',') && !desc.includes(';')) {
+      if (desc.length > 8 && desc.length < 35 && !desc.includes(',') && !desc.includes(';')) {
         return desc;
       }
     }
     
-    // Extract compound terms that are descriptive
+    // Extract compound terms that are descriptive (expanded list)
     const compoundTerms = [
       'generative credit', 'pricing structure', 'output quality', 'feature limitations',
       'batch processing', 'mobile features', 'video generation', 'disk space',
-      'user experience', 'technical issues', 'legal concerns'
+      'user experience', 'technical issues', 'legal concerns', 'advanced prompt',
+      'higher resolution', 'deeper integration', 'enhanced style', 'unlimited credits',
+      'transparent pricing', 'predictable pricing', 'professional use', 'commercial licensing',
+      'workflow integration', 'cross-product', 'frame-accurate', 'user-trainable',
+      'style transfer', 'content safety', 'export resolution', 'subscription model',
+      'maximum export', 'monthly generative', 'flat-fee tiers', 'microtransactions'
     ];
     
     for (const term of compoundTerms) {
       if (text.includes(term)) {
         return term.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+      }
+    }
+    
+    // Fallback: Create summary from key adjectives + nouns
+    const adjectiveNounPatterns = [
+      /\b(unlimited|higher|deeper|enhanced|advanced|improved|better|direct|transparent|predictable|professional|commercial)\s+(\w+)/gi,
+      /\b(\w+)\s+(support|features|integration|controls|quality|system|access|pricing|resolution|documentation|guidance)/gi
+    ];
+    
+    for (const pattern of adjectiveNounPatterns) {
+      const match = text.match(pattern);
+      if (match && match[0].length > 8 && match[0].length < 30) {
+        return match[0].split(' ').map(word => 
           word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ');
       }
@@ -174,18 +211,42 @@ function App() {
       const firstTwo = words.slice(0, 2).join(' ');
       const firstThree = words.slice(0, 3).join(' ');
       
+      // Expanded list of meaningful starting words
+      const meaningfulStarters = [
+        'Generative', 'Pricing', 'Integration', 'Ethical', 'Feature', 'Disk',
+        'Advanced', 'Higher', 'Deeper', 'Enhanced', 'Video', 'Mobile', 'Legal',
+        'Credit', 'Output', 'Unlimited', 'Improved', 'Better'
+      ];
+      
       // Single meaningful word
       if (firstWord.length > 3 && /^[A-Z]/.test(firstWord) && 
-          ['Generative', 'Pricing', 'Integration', 'Ethical', 'Feature', 'Disk'].includes(firstWord)) {
+          meaningfulStarters.includes(firstWord)) {
         return firstWord;
       }
       
-      // Two meaningful words
-      if (firstTwo.length > 5 && firstTwo.length < 25 && 
+      // Two meaningful words - more flexible matching
+      if (firstTwo.length > 5 && firstTwo.length < 30 && 
           /^[A-Z]/.test(firstTwo) && 
           !firstTwo.toLowerCase().includes('the ') &&
-          !firstTwo.toLowerCase().includes('this ')) {
-        return firstTwo;
+          !firstTwo.toLowerCase().includes('this ') &&
+          !firstTwo.toLowerCase().includes('some ')) {
+        
+        // Check if it's a meaningful combination
+        const meaningfulCombos = [
+          /^(Advanced|Higher|Deeper|Enhanced|Video|Mobile|Legal|Credit|Output|Unlimited|Improved|Better|Direct)/i,
+          /^[A-Z][a-z]+ (support|features|integration|controls|quality|system|access)/i
+        ];
+        
+        if (meaningfulCombos.some(regex => firstTwo.match(regex))) {
+          return firstTwo;
+        }
+      }
+      
+      // Three words for compound concepts
+      if (firstThree.length > 8 && firstThree.length < 35 &&
+          /^[A-Z]/.test(firstThree) &&
+          firstThree.match(/^[A-Z][a-z]+ [a-z]+ (controls|features|integration|support|system|access|quality)/i)) {
+        return firstThree;
       }
     }
     

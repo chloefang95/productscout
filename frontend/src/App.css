@@ -118,9 +118,10 @@
 /* New dual-column layout */
 .results-container {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 60% 40%;
   gap: 30px;
   margin-top: 30px;
+  width: 100%;
 }
 
 .analyze-column,
