@@ -1,0 +1,27 @@
+If you want to start all services from one terminal with background processes:
+Apply to randomnotes....
+Run
+cd /Users/zhenfang/CascadeProjects/startupleadscoutv2
+
+# Start analyze service in background
+python start_analyze.py &
+
+# Start reach service in background  
+python start_reach.py &
+
+# Start frontend
+cd frontend && npm start
+========
+ou'll need 3 separate terminal windows/tabs:
+Terminal 1: Analyze Service (Port 8000)
+Apply to randomnotes....
+Run
+py
+Terminal 2: Reach Service (Port 8001)
+Apply to randomnotes....
+Run
+py
+Terminal 3: Frontend (Port 3000)
+Apply to randomnotes....
+Run
+start
