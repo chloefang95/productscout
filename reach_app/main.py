@@ -17,8 +17,8 @@ app = FastAPI(title="Startup Lead Scout - Reach Service", version="1.0.0")
 # Allow CORS for local frontend and production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://*.vercel.app"],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for now - can be restricted later
+    allow_credentials=False,  # Set to False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
