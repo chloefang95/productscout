@@ -10,10 +10,10 @@ PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
 
 app = FastAPI(title="Startup Lead Scout - Analyze Service", version="1.0.0")
 
-# Allow CORS for local frontend
+# Allow CORS for local frontend and production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://*.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -14,10 +14,10 @@ REDDIT_USER_AGENT = os.getenv('REDDIT_USER_AGENT', 'StartupLeadScout/1.0')
 
 app = FastAPI(title="Startup Lead Scout - Reach Service", version="1.0.0")
 
-# Allow CORS for local frontend
+# Allow CORS for local frontend and production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://*.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

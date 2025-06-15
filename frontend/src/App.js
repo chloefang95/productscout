@@ -408,15 +408,18 @@ function App() {
 
     try {
       // Call both services simultaneously
+      const analyzeUrl = process.env.REACT_APP_ANALYZE_API_URL || 'http://localhost:8000/analyze';
+      const reachUrl = process.env.REACT_APP_REACH_API_URL || 'http://localhost:8001/reach';
+      
       const [analyzeResponse, reachResponse] = await Promise.all([
-        fetch('http://localhost:8000/analyze', {
+        fetch(analyzeUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ idea: idea.trim() }),
         }),
-        fetch('http://localhost:8001/reach', {
+        fetch(reachUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
