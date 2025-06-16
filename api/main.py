@@ -5,7 +5,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import requests
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+# Load environment variables (works both locally and on Vercel)
+load_dotenv()
 PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
 
 app = FastAPI(title="Startup Lead Scout - Analyze Service", version="1.0.0")
