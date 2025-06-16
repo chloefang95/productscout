@@ -1,1 +1,23 @@
-{} 
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "analyze_app/main.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "reach_app/main.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/analyze/(.*)",
+      "destination": "/analyze_app/main.py"
+    },
+    {
+      "source": "/api/reach/(.*)",
+      "destination": "/reach_app/main.py"
+    }
+  ]
+} 
