@@ -4,24 +4,12 @@
     {
       "src": "analyze_app/main.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "reach_app/main.py", 
-      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/analyze/(.*)",
-      "dest": "analyze_app/main.py"
-    },
-    {
-      "src": "/api/reach/(.*)",
-      "dest": "reach_app/main.py"
-    },
-    {
       "src": "/(.*)",
-      "dest": "frontend/dist/index.html"
+      "dest": "analyze_app/main.py"
     }
   ]
 } 
