@@ -1,23 +1,27 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "analyze_app/main.py": {
-      "memory": 1024,
-      "maxDuration": 30
+  "builds": [
+    {
+      "src": "analyze_app/main.py",
+      "use": "@vercel/python"
     },
-    "reach_app/main.py": {
-      "memory": 1024,
-      "maxDuration": 30
+    {
+      "src": "reach_app/main.py", 
+      "use": "@vercel/python"
     }
-  },
-  "rewrites": [
+  ],
+  "routes": [
     {
-      "source": "/api/analyze/(.*)",
-      "destination": "/analyze_app/main.py"
+      "src": "/api/analyze/(.*)",
+      "dest": "analyze_app/main.py"
     },
     {
-      "source": "/api/reach/(.*)",
-      "destination": "/reach_app/main.py"
+      "src": "/api/reach/(.*)",
+      "dest": "reach_app/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/dist/index.html"
     }
   ]
 } 
