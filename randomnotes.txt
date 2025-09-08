@@ -1,3 +1,34 @@
+20250810 update:
+Frontend
+    Location: frontend/ (Create React App)
+    Run scripts live in frontend/package.json
+Active backend services (local dev)
+    Analyze Service: analyze_app/main.py on port 8000
+    Reach Service: reach_app/main.py on port 8001
+    Root runners: start_analyze.py and start_reach.py start those exact apps via uvicorn
+Serverless/legacy variants (not needed for local dev)
+    Analyze (serverless): api/main.py with handler = app; wired by vercel.json for Vercel
+    Reach (serverless): api_reach/main.py with handler = app; wired by vercel_reach.json
+    Reach (alt vercel config): reach_vercel.json targets reach_app/main.py (kept as an alternative setup)
+
+Env variables actually read by code
+    analyze_app/main.py reads: PERPLEXITY_API_KEY (from analyze_app/.env)
+    reach_app/main.py reads: PERPLEXITY_API_KEY, REDDIT_APP_ID, REDDIT_APP_SECRET, REDDIT_USER_AGENT (from reach_app/.env)
+    Note: Some docs mention REDDIT_CLIENT_ID/SECRET, but the code currently expects REDDIT_APP_ID/SECRET. If you had both set before, that explains why it worked.
+
+
+1. check if needs to install any dependencies
+2. activate project
+    back ends:
+    python start_analyze.py
+    python start_reach.py
+    front end:
+    cd frontend
+    npm start
+
+http://localhost:3000
+
+==========================
 If you want to start all services from one terminal with background processes:
 Apply to randomnotes....
 Run

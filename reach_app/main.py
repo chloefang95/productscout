@@ -8,8 +8,8 @@ import requests
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
-REDDIT_CLIENT_ID = os.getenv('REDDIT_APP_ID')
-REDDIT_CLIENT_SECRET = os.getenv('REDDIT_APP_SECRET')
+REDDIT_CLIENT_ID = os.getenv('REDDIT_APP_ID') or os.getenv('REDDIT_CLIENT_ID')
+REDDIT_CLIENT_SECRET = os.getenv('REDDIT_APP_SECRET') or os.getenv('REDDIT_CLIENT_SECRET')
 REDDIT_USER_AGENT = os.getenv('REDDIT_USER_AGENT', 'StartupLeadScout/1.0')
 
 app = FastAPI(title="Startup Lead Scout - Reach Service", version="1.0.0")

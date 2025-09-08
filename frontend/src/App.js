@@ -522,8 +522,8 @@ function App() {
     <div className="App">
       <div className="container">
         <header className="header">
-          <h1 className="title">🚀 Startup Lead Scout</h1>
-          <p className="subtitle">Discover what Reddit thinks about your startup idea</p>
+          <h1 className="title">🚀 Product Sentiment Scout</h1>
+          <p className="subtitle">See what real users love, hate, and request about the product, instantly powered by Reddit</p>
           <p className="created-by">Created by Chloe Fang</p>
         </header>
 

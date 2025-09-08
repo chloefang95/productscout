@@ -1,15 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
-    {
-      "src": "api/main.py",
-      "use": "@vercel/python"
-    }
+    { "src": "analyze_app/main.py", "use": "@vercel/python" },
+    { "src": "reach_app/main.py", "use": "@vercel/python" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/main.py"
-    }
+    { "src": "^/analyze$", "dest": "analyze_app/main.py" },
+    { "src": "^/reach$", "dest": "reach_app/main.py" }
   ]
-} 
+}
