@@ -5,6 +5,7 @@
     { "src": "reach_app/main.py", "use": "@vercel/python" }
   ],
   "routes": [
+    { "src": "^/$", "dest": "analyze_app/main.py" },
     { "src": "^/analyze$", "dest": "analyze_app/main.py" },
     { "src": "^/reach$", "dest": "reach_app/main.py" }
   ]
